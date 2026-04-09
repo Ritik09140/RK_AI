@@ -7,7 +7,7 @@ from datetime import datetime
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 import pathlib
 # --- OFFICIAL GOOGLE GEMINI SDK ---
 import google.generativeai as genai
