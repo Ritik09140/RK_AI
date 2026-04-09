@@ -131,3 +131,7 @@ def chat_api(request):
 
     except Exception as e:
         return JsonResponse({'reply': f'Error: {str(e)}', 'status': 'error'}, status=500)
+        from django.http import HttpResponse
+
+def home(request):
+    return HttpResponse("RK AI Working 🚀")
