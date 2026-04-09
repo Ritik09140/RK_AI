@@ -1,0 +1,29 @@
+.boot-screen {
+    position: fixed; inset: 0; background: #000; z-index: 9999;
+    display: flex; justify-content: center; align-items: center;
+    color: var(--accent-color, #00f0ff); cursor: pointer;
+    transition: opacity 1s ease;
+}
+.boot-content { text-align: center; }
+.boot-loader {
+    width: 60px; height: 60px; border-radius: 50%;
+    border: 3px solid rgba(0,240,255,0.2);
+    border-top-color: #00f0ff;
+    animation: bootSpin 1s linear infinite;
+    margin: 0 auto 2rem;
+}
+@keyframes bootSpin { 100% { transform: rotate(360deg); } }
+.boot-icon {
+    font-size: 4rem; margin-bottom: 1.5rem; display: block;
+    animation: pulseCore 2s infinite alternate;
+    text-shadow: 0 0 20px #00f0ff;
+}
+@keyframes pulseCore { 0% { opacity: 0.6; } 100% { opacity: 1; text-shadow: 0 0 40px #00f0ff; } }
+.boot-content h2 { letter-spacing: 5px; font-weight: 300; margin-bottom: 0.5rem; font-family: 'Outfit', sans-serif; font-size: 1.5rem; }
+.boot-content p { color: rgba(255,255,255,0.5); font-family: 'Outfit', sans-serif; margin-bottom: 2rem; }
+.tap-hint {
+    font-family: 'Outfit', sans-serif; font-size: 0.8rem;
+    letter-spacing: 4px; color: rgba(0,240,255,0.6);
+    animation: blink 1.5s ease-in-out infinite;
+}
+@keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }

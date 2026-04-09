@@ -1,0 +1,54 @@
+{
+    "OPEN_APP": [
+        "(?:open|kholo|chalao|launch|start)\\s+([a-zA-Z\\s]+)",
+        "([a-zA-Z\\s]+)\\s+(?:kholo|chalao|launch|start)"
+    ],
+    "PLAY_YOUTUBE": [
+        "(?:play|chalao|search on youtube)\\s+([a-zA-Z0-9\\s]+)",
+        "([a-zA-Z0-9\\s]+)\\s+on\\s+youtube",
+        "youtube\\s+(?:par|pe)\\s+([a-zA-Z0-9\\s]+)\\s+(?:song|video|chalao)"
+    ],
+    "SEARCH_GOOGLE": [
+        "(?:search|khojo|find)\\s+(?:on google)?\\s+([a-zA-Z0-9\\s]+)",
+        "([a-zA-Z0-9\\s]+)\\s+(?:search karo|google par)"
+    ],
+    "SYSTEM_COMMAND": {
+        "shutdown": [
+            "shutdown",
+            "pc band",
+            "system band"
+        ],
+        "restart": [
+            "restart",
+            "reboot"
+        ],
+        "volume_up": [
+            "volume up",
+            "awaz badhao",
+            "volume badhao"
+        ],
+        "volume_down": [
+            "volume down",
+            "awaz kam",
+            "volume kam"
+        ],
+        "mute": [
+            "mute",
+            "chup karo"
+        ],
+        "screenshot": [
+            "screenshot",
+            "screen capture",
+            "snap"
+        ]
+    },
+    "TIME_INFO": [
+        "time",
+        "kitne baje",
+        "samay",
+        "waqt",
+        "date",
+        "tarikh",
+        "aaj ki tarikh"
+    ]
+}

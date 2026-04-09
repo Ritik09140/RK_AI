@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RK AI — Robot Intelligence v4.0</title>
+    <meta name="description" content="RK AI — Advanced multilingual robot assistant created by Ritik Boss. Speaks Hindi, Gujarati, Marathi, English.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --c-cyan: #00f5ff;
+            --c-pink: #ff0090;
+            --c-green: #00ff88;
+            --c-purple: #8b00ff;
+            --c-gold: #ffd700;
+            --c-bg: #050a15;
+            --c-bg2: #0a1628;
+            --c-panel: rgba(10,25,50,0.85);
+            --c-border: rgba(0,245,255,0.2);
+            --font-main: 'Rajdhani', sans-serif;
+            --font-head: 'Orbitron', monospace;
+            --font-code: 'JetBrains Mono', monospace;
+        }
+
+        html, body {
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background: var(--c-bg);
+            color: #e0f0ff;
+            font-family: var(--font-main);
+        }
+
+        /* ===== ANIMATED BACKGROUND ===== */
+        .bg-canvas {
+            position: fixed; inset: 0; z-index: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 80%, rgba(0,100,200,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 80% 20%, rgba(140,0,255,0.10) 0%, transparent 60%),
+                var(--c-bg);
+        }
+
+        .grid-lines {
+            position: fixed; inset: 0; z-index: 0;
+            background-image:
+                linear-gradient(rgba(0,245,255,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,245,255,0.04) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridDrift 20s linear infinite;
+        }
+        @keyframes gridDrift {
+            from { background-position: 0 0; }
+            to { background-position: 60px 60px; }
+        }
+
+        /* Floating particles */
+        .particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .particle {
+            position: absolute;
+            width: 3px; height: 3px;
+            border-radius: 50%;
+            background: var(--c-cyan);
+            animation: particleFloat linear infinite;
+            opacity: 0;
+        }
+        @keyframes particleFloat {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.4; }
+            100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+        }
+
+        /* ===== BOOT SCREEN ===== */
+        #boot-screen {
+            position: fixed; inset: 0; z-index: 9999;
+            background: #020810;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: opacity 0.8s ease;
+        }
+        .boot-inner {
+            text-align: center;
+            position: relative;
+        }
+        .boot-robot {
+            width: 160px; height: 160px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+        .boot-robot-head {
+            width: 100px; height: 80px;
+            background: linear-gradient(145deg, #1a2d4a, #0d1f38);
+            border: 2px solid var(--c-cyan);
+            border-radius: 16px;
+            margin: 0 auto;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,245,255,0.4), inset 0 0 20px rgba(0,245,255,0.05);
+            animation: bootHeadPulse 2s ease-in-out infinite;
+        }
+        @keyframes bootHeadPulse {
+            0%, 100% { box-shadow: 0 0 30px rgba(0,245,255,0.4), inset 0 0 20px rgba(0,245,255,0.05); }
+            50% { box-shadow: 0 0 60px rgba(0,245,255,0.8), inset 0 0 30px rgba(0,245,255,0.1); }
+        }
+        .boot-robot-eyes {
+            display: flex; gap: 20px;
+            justify-content: center; align-items: center;
+            padding-top: 20px;
+        }
+        .boot-robot-eye {
+            width: 22px; height: 14px;
+            background: var(--c-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--c-cyan);
+            animation: bootBlink 3s ease-in-out infinite;
+        }
+        @keyframes bootBlink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+        .boot-robot-mouth {
+            width: 40px; height: 8px;
+            background: linear-gradient(90deg, transparent 0%, var(--c-cyan) 30%, var(--c-cyan) 70%, transparent 100%);
+            border-radius: 4px;
+            margin: 12px auto 0;
+            animation: mouthPulse 1s ease-in-out infinite;
+        }
+        @keyframes mouthPulse {
+            0%, 100% { opacity: 0.6; width: 30px; }
+            50% { opacity: 1; width: 50px; }
+        }
+        .boot-robot-body {
+            width: 80px; height: 50px;
+            background: linear-gradient(145deg, #1a2d4a, #0d1f38);
+            border: 2px solid rgba(0,245,255,0.5);
+            border-radius: 10px;
+            margin: 8px auto 0;
+            display: flex; align-items: center; justify-content: center;
+            gap: 8px;
+        }
+        .boot-led { width: 8px; height: 8px; border-radius: 50%; animation: bootLed 0.8s ease-in-out infinite alternate; }
+        .boot-led:nth-child(1) { background: var(--c-cyan); box-shadow: 0 0 8px var(--c-cyan); animation-delay: 0s; }
+        .boot-led:nth-child(2) { background: var(--c-green); box-shadow: 0 0 8px var(--c-green); animation-delay: 0.2s; }
+        .boot-led:nth-child(3) { background: var(--c-pink); box-shadow: 0 0 8px var(--c-pink); animation-delay: 0.4s; }
+        @keyframes bootLed { from { opacity: 0.3; } to { opacity: 1; } }
+
+        .boot-title {
+            font-family: var(--font-head);
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--c-cyan);
+            text-shadow: 0 0 30px var(--c-cyan);
+            margin-bottom: 8px;
+            letter-spacing: 4px;
+        }
+        .boot-title span { color: var(--c-pink); }
+        .boot-subtitle { font-size: 1rem; color: rgba(0,245,255,0.6); font-family: var(--font-code); letter-spacing: 2px; margin-bottom: 30px; }
+        .boot-loader-track { width: 280px; height: 3px; background: rgba(0,245,255,0.15); border-radius: 2px; margin: 0 auto 20px; overflow: hidden; }
+        .boot-loader-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--c-cyan), var(--c-purple)); border-radius: 2px; animation: bootLoad 2.5s ease forwards; box-shadow: 0 0 10px var(--c-cyan); }
+        @keyframes bootLoad { from { width: 0%; } to { width: 100%; } }
+        .boot-tap { font-family: var(--font-head); font-size: 0.75rem; color: rgba(0,245,255,0.5); letter-spacing: 3px; animation: bootTap 1.5s ease-in-out infinite; }
+        @keyframes bootTap { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+        /* ===== APP LAYOUT ===== */
+        #app {
+            position: relative; z-index: 1;
+            width: 100%; height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 20px;
+            background: rgba(5,15,30,0.9);
+            border-bottom: 1px solid var(--c-border);
+            backdrop-filter: blur(20px);
+            position: relative;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+        .header::after {
+            content: '';
+            position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--c-cyan), transparent);
+            animation: headerGlow 3s ease-in-out infinite;
+        }
+        @keyframes headerGlow { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand-logo { position: relative; }
+        .brand-logo-inner {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, var(--c-cyan), var(--c-purple));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+            animation: logoSpin 8s linear infinite;
+        }
+        @keyframes logoSpin { 0% { box-shadow: 0 0 15px rgba(0,245,255,0.5); } 50% { box-shadow: 0 0 30px rgba(140,0,255,0.8); } 100% { box-shadow: 0 0 15px rgba(0,245,255,0.5); } }
+        .brand-text { display: flex; flex-direction: column; }
+        .brand-name {
+            font-family: var(--font-head);
+            font-size: 1.3rem; font-weight: 900;
+            color: var(--c-cyan);
+            text-shadow: 0 0 15px var(--c-cyan);
+            letter-spacing: 2px;
+        }
+        .brand-name span { color: var(--c-pink); }
+        .brand-version { font-size: 0.65rem; color: rgba(0,245,255,0.5); font-family: var(--font-code); letter-spacing: 2px; }
+        .brand-creator { font-size: 0.7rem; color: var(--c-gold); font-weight: 600; }
+
+        .status-pill {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(0,245,255,0.07);
+            border: 1px solid var(--c-border);
+            border-radius: 20px;
+            padding: 5px 14px;
+        }
+        .status-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--c-green);
+            box-shadow: 0 0 10px var(--c-green);
+            animation: dotBeat 1.5s ease-in-out infinite;
+        }
+        @keyframes dotBeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.4); } }
+        .status-txt { font-size: 0.75rem; font-family: var(--font-code); color: rgba(0,245,255,0.8); }
+
+        .header-right { display: flex; align-items: center; gap: 10px; }
+        .lang-pills { display: flex; gap: 5px; }
+        .lang-pill {
+            background: none; border: 1px solid rgba(0,245,255,0.25);
+            color: rgba(0,245,255,0.6); font-size: 0.7rem;
+            padding: 4px 10px; border-radius: 20px; cursor: pointer;
+            font-family: var(--font-head); font-weight: 600;
+            transition: all 0.2s;
+        }
+        .lang-pill:hover, .lang-pill.active {
+            background: var(--c-cyan); color: #000;
+            border-color: var(--c-cyan);
+            box-shadow: 0 0 12px rgba(0,245,255,0.5);
+        }
+
+        /* ===== MAIN AREA ===== */
+        .workspace {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            overflow: hidden;
+        }
+
+        /* ===== LEFT: ROBOT ===== */
+        .robot-panel {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 20px;
+            border-right: 1px solid var(--c-border);
+            background: rgba(5,12,25,0.6);
+            position: relative;
+            overflow: hidden;
+        }
+        .robot-panel::before {
+            content: '';
+            position: absolute;
+            width: 300px; height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,245,255,0.06) 0%, transparent 70%);
+            animation: ambientPulse 4s ease-in-out infinite;
+        }
+        @keyframes ambientPulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        /* ROBOT SVG STRUCTURE */
+        .robot-unit {
+            position: relative;
+            z-index: 1;
+            animation: robotHover 3s ease-in-out infinite;
+            cursor: default;
+        }
+        @keyframes robotHover {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* Antenna */
+        .robot-antenna {
+            display: flex; justify-content: center;
+            margin-bottom: 4px;
+        }
+        .antenna-pole {
+            width: 3px; height: 25px;
+            background: linear-gradient(to top, rgba(0,245,255,0.5), var(--c-cyan));
+            border-radius: 2px;
+        }
+        .antenna-ball {
+            position: absolute;
+            width: 12px; height: 12px; border-radius: 50%;
+            background: var(--c-cyan);
+            box-shadow: 0 0 15px var(--c-cyan), 0 0 30px rgba(0,245,255,0.5);
+            top: 0; left: 50%; transform: translateX(-50%);
+            animation: antennaPulse 1s ease-in-out infinite;
+        }
+        @keyframes antennaPulse { 0%, 100% { box-shadow: 0 0 10px var(--c-cyan); } 50% { box-shadow: 0 0 25px var(--c-cyan), 0 0 50px rgba(0,245,255,0.8); } }
+
+        /* Robot Head */
+        .robot-head {
+            width: 130px; height: 110px;
+            background: linear-gradient(145deg, #1a3060, #0d1e3a);
+            border: 2px solid rgba(0,245,255,0.6);
+            border-radius: 20px;
+            position: relative;
+            box-shadow:
+                0 0 30px rgba(0,245,255,0.3),
+                inset 0 0 20px rgba(0,100,200,0.1),
+                0 15px 40px rgba(0,0,0,0.5);
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        .robot-head::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 40%;
+            background: linear-gradient(to bottom, rgba(0,245,255,0.08), transparent);
+            border-radius: 18px 18px 0 0;
+        }
+        /* Edge glow lines on head */
+        .robot-head::after {
+            content: '';
+            position: absolute; inset: 0;
+            border-radius: 18px;
+            border: 1px solid rgba(0,245,255,0.15);
+        }
+
+        /* Eyes */
+        .robot-eyes {
+            display: flex; gap: 22px;
+            justify-content: center;
+            padding-top: 26px;
+            padding-left: 5px;
+        }
+        .robot-eye {
+            width: 28px; height: 18px;
+            background: var(--c-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--c-cyan), 0 0 30px rgba(0,245,255,0.5);
+            position: relative;
+            animation: eyeIdle 4s ease-in-out infinite;
+            transition: all 0.2s;
+        }
+        .robot-eye .pupil {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: #001122;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation: pupilMove 5s ease-in-out infinite;
+        }
+        @keyframes eyeIdle {
+            0%, 85%, 100% { transform: scaleY(1); }
+            90% { transform: scaleY(0.05); } /* blink */
+        }
+        @keyframes pupilMove {
+            0%, 100% { transform: translate(-50%, -50%); }
+            25% { transform: translate(-70%, -50%); }
+            75% { transform: translate(-30%, -50%); }
+        }
+
+        /* Nose sensor */
+        .robot-nose {
+            width: 10px; height: 6px; border-radius: 50%;
+            background: rgba(255,0,144,0.6);
+            box-shadow: 0 0 8px var(--c-pink);
+            margin: 8px auto;
+        }
+
+        /* Mouth */
+        .robot-mouth {
+            width: 70px;
+            height: 20px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(0,245,255,0.3);
+        }
+        .mouth-segment {
+            position: absolute; bottom: 0;
+            width: 8px;
+            background: linear-gradient(to top, var(--c-cyan), rgba(0,245,255,0.3));
+            border-radius: 2px 2px 0 0;
+            transition: height 0.08s ease;
+            box-shadow: 0 0 6px var(--c-cyan);
+        }
+
+        /* Robot Ears */
+        .robot-ear {
+            position: absolute;
+            width: 14px; height: 40px;
+            background: linear-gradient(to bottom, #1a3060, #0d1e3a);
+            border: 1px solid rgba(0,245,255,0.4);
+            border-radius: 6px;
+            top: 50%; transform: translateY(-50%);
+        }
+        .robot-ear.left { left: -15px; border-right: none; border-radius: 6px 0 0 6px; }
+        .robot-ear.right { right: -15px; border-left: none; border-radius: 0 6px 6px 0; }
+        .ear-light {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--c-green);
+            box-shadow: 0 0 8px var(--c-green);
+            margin: 8px auto;
+            animation: earLight 2s ease-in-out infinite alternate;
+        }
+        @keyframes earLight { from { opacity: 0.3; } to { opacity: 1; } }
+
+        /* Neck */
+        .robot-neck {
+            width: 50px; height: 15px;
+            background: linear-gradient(to bottom, #1a3060, #0d1a30);
+            border-left: 2px solid rgba(0,245,255,0.3);
+            border-right: 2px solid rgba(0,245,255,0.3);
+            margin: 0 auto;
+        }
+
+        /* Robot Body */
+        .robot-body {
+            width: 140px; height: 110px;
+            background: linear-gradient(145deg, #1a3060, #0d1e3a, #0a1525);
+            border: 2px solid rgba(0,245,255,0.5);
+            border-radius: 16px;
+            margin: 0 auto;
+            position: relative;
+            box-shadow: 0 0 25px rgba(0,245,255,0.2), 0 20px 50px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+        .robot-body::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 30%;
+            background: linear-gradient(to bottom, rgba(0,245,255,0.06), transparent);
+        }
+        /* Chest panel */
+        .chest-panel {
+            width: 80px; height: 50px;
+            background: rgba(0,5,15,0.6);
+            border: 1px solid rgba(0,245,255,0.3);
+            border-radius: 8px;
+            margin: 20px auto 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 6px;
+            padding: 8px;
+            align-items: center;
+            justify-items: center;
+        }
+        .chest-led {
+            width: 10px; height: 10px; border-radius: 50%;
+            animation: chestLed 1.5s ease-in-out infinite;
+        }
+        .chest-led:nth-child(1) { background: var(--c-cyan); box-shadow: 0 0 8px var(--c-cyan); animation-delay: 0s; }
+        .chest-led:nth-child(2) { background: var(--c-green); box-shadow: 0 0 8px var(--c-green); animation-delay: 0.2s; }
+        .chest-led:nth-child(3) { background: var(--c-pink); box-shadow: 0 0 8px var(--c-pink); animation-delay: 0.4s; }
+        .chest-led:nth-child(4) { background: var(--c-purple); box-shadow: 0 0 8px var(--c-purple); animation-delay: 0.6s; }
+        .chest-led:nth-child(5) { background: var(--c-gold); box-shadow: 0 0 8px var(--c-gold); animation-delay: 0.8s; }
+        .chest-led:nth-child(6) { background: var(--c-cyan); box-shadow: 0 0 8px var(--c-cyan); animation-delay: 1.0s; }
+        @keyframes chestLed {
+            0%, 100% { transform: scale(0.8); opacity: 0.4; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        /* Arms */
+        .robot-arms {
+            display: flex; justify-content: space-between;
+            position: absolute; top: 15px; left: -20px; right: -20px;
+        }
+        .robot-arm {
+            width: 18px; height: 80px;
+            background: linear-gradient(to bottom, #1a3060, #0d1e3a);
+            border: 1px solid rgba(0,245,255,0.35);
+            border-radius: 8px;
+            position: relative;
+        }
+        .arm-joint {
+            width: 18px; height: 18px; border-radius: 50%;
+            background: var(--c-bg2);
+            border: 1px solid rgba(0,245,255,0.4);
+            position: absolute; top: -8px; left: 0;
+        }
+
+        /* Robot Legs */
+        .robot-legs {
+            display: flex; justify-content: center; gap: 15px;
+            margin-top: 5px;
+        }
+        .robot-leg {
+            width: 30px; height: 40px;
+            background: linear-gradient(to bottom, #1a3060, #0d1e3a);
+            border: 1px solid rgba(0,245,255,0.35);
+            border-radius: 6px;
+            position: relative;
+        }
+        .robot-foot {
+            width: 38px; height: 14px;
+            background: linear-gradient(to right, #1a3060, #0d1e3a);
+            border: 1px solid rgba(0,245,255,0.3);
+            border-radius: 4px;
+            position: absolute;
+            bottom: -12px;
+            left: -4px;
+        }
+
+        /* Speech bubble / ring waves */
+        .robot-rings {
+            position: absolute;
+            width: 200px; height: 200px;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        .robot-ring {
+            position: absolute; inset: 0;
+            border: 1px solid rgba(0,245,255,0.15);
+            border-radius: 50%;
+            animation: ringExpand 3s ease-out infinite;
+        }
+        .robot-ring:nth-child(2) { animation-delay: 1s; }
+        .robot-ring:nth-child(3) { animation-delay: 2s; }
+        @keyframes ringExpand {
+            0% { transform: scale(0.5); opacity: 0.8; }
+            100% { transform: scale(2.5); opacity: 0; }
+        }
+
+        /* State label */
+        .robot-state {
+            font-family: var(--font-head);
+            font-size: 0.8rem;
+            color: var(--c-cyan);
+            text-shadow: 0 0 10px var(--c-cyan);
+            text-align: center;
+            margin-top: 15px;
+            letter-spacing: 3px;
+            min-height: 24px;
+        }
+
+        /* Scan line effect on robot */
+        .scan-line {
+            position: absolute;
+            left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(0,245,255,0.6), transparent);
+            animation: scanMove 3s linear infinite;
+            pointer-events: none;
+            top: 0;
+        }
+        @keyframes scanMove {
+            from { top: 0%; }
+            to { top: 100%; }
+        }
+
+        /* ===== ROBOT STATES ===== */
+        /* LISTENING */
+        .robot-unit.listening .robot-eye { background: var(--c-pink); box-shadow: 0 0 20px var(--c-pink); animation: none; transform: scaleY(1); }
+        .robot-unit.listening .robot-body { border-color: rgba(255,0,144,0.6); box-shadow: 0 0 30px rgba(255,0,144,0.3); }
+        .robot-unit.listening .antenna-ball { background: var(--c-pink); box-shadow: 0 0 20px var(--c-pink); animation: antennaPulse 0.5s ease-in-out infinite; }
+
+        /* THINKING */
+        .robot-unit.thinking .robot-eye { background: var(--c-purple); box-shadow: 0 0 20px var(--c-purple); }
+        .robot-unit.thinking .robot-body { border-color: rgba(139,0,255,0.7); box-shadow: 0 0 30px rgba(139,0,255,0.3); }
+        .robot-unit.thinking .antenna-ball { background: var(--c-purple); animation: antennaPulse 0.3s ease-in-out infinite; }
+        .robot-unit.thinking { animation: robotThink 0.5s ease-in-out infinite; }
+        @keyframes robotThink { 0%, 100% { transform: rotate(-1deg); } 50% { transform: rotate(1deg); } }
+
+        /* SPEAKING */
+        .robot-unit.speaking .robot-eye { background: var(--c-green); box-shadow: 0 0 20px var(--c-green); }
+        .robot-unit.speaking .robot-body { border-color: rgba(0,255,136,0.6); box-shadow: 0 0 30px rgba(0,255,136,0.3); }
+        .robot-unit.speaking .antenna-ball { background: var(--c-green); animation: antennaPulse 0.4s ease-in-out infinite; }
+        .robot-unit.speaking .chest-led { animation: chestLed 0.3s ease-in-out infinite !important; }
+
+        /* ===== RIGHT: CHAT PANEL ===== */
+        .chat-panel {
+            display: flex; flex-direction: column;
+            background: rgba(5,12,25,0.7);
+            backdrop-filter: blur(20px);
+            overflow: hidden;
+        }
+        .chat-header {
+            padding: 14px 20px;
+            background: rgba(5,15,35,0.8);
+            border-bottom: 1px solid var(--c-border);
+            display: flex; align-items: center; justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .chat-header-title {
+            font-family: var(--font-head);
+            font-size: 0.9rem;
+            color: var(--c-cyan);
+            letter-spacing: 2px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .chat-header-title i { font-size: 1.1rem; }
+        .chat-header-right { display: flex; gap: 8px; }
+        .hdr-btn {
+            background: rgba(0,245,255,0.06);
+            border: 1px solid var(--c-border);
+            color: rgba(0,245,255,0.7); border-radius: 8px;
+            width: 34px; height: 34px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s; font-size: 0.85rem;
+        }
+        .hdr-btn:hover { background: rgba(0,245,255,0.15); color: var(--c-cyan); border-color: var(--c-cyan); }
+
+        /* Messages */
+        .chat-messages {
+            flex: 1; overflow-y: auto; overflow-x: hidden;
+            padding: 16px;
+            scroll-behavior: smooth;
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .chat-messages::-webkit-scrollbar { width: 4px; }
+        .chat-messages::-webkit-scrollbar-track { background: transparent; }
+        .chat-messages::-webkit-scrollbar-thumb { background: rgba(0,245,255,0.2); border-radius: 2px; }
+
+        .msg {
+            display: flex; gap: 10px; align-items: flex-start;
+            animation: msgIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            max-width: 85%;
+        }
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(12px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .msg.user { margin-left: auto; flex-direction: row-reverse; }
+        .msg-avatar {
+            width: 34px; height: 34px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; flex-shrink: 0;
+        }
+        .msg.ai .msg-avatar { background: linear-gradient(135deg, rgba(0,245,255,0.2), rgba(0,100,200,0.2)); border: 1px solid rgba(0,245,255,0.3); color: var(--c-cyan); }
+        .msg.user .msg-avatar { background: linear-gradient(135deg, rgba(139,0,255,0.2), rgba(255,0,144,0.1)); border: 1px solid rgba(139,0,255,0.35); color: var(--c-purple); }
+        .msg-bubble {
+            border-radius: 14px;
+            padding: 10px 14px;
+            font-size: 0.95rem; line-height: 1.55;
+            position: relative;
+        }
+        .msg.ai .msg-bubble {
+            background: rgba(0,245,255,0.06);
+            border: 1px solid rgba(0,245,255,0.15);
+            color: #d0e8ff;
+            border-top-left-radius: 4px;
+        }
+        .msg.user .msg-bubble {
+            background: rgba(139,0,255,0.12);
+            border: 1px solid rgba(139,0,255,0.25);
+            color: #e0d0ff;
+            border-top-right-radius: 4px;
+        }
+        .msg-time { font-size: 0.65rem; color: rgba(255,255,255,0.3); margin-top: 5px; font-family: var(--font-code); display: block; }
+
+        /* Typing indicator */
+        .typing-indicator {
+            display: none; gap: 5px; align-items: center;
+            padding: 10px 14px;
+            background: rgba(0,245,255,0.06);
+            border: 1px solid rgba(0,245,255,0.15);
+            border-radius: 14px 14px 14px 4px;
+            width: fit-content;
+        }
+        .typing-indicator.visible { display: flex; }
+        .typing-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: var(--c-cyan); opacity: 0.4;
+            animation: typingBounce 1.2s ease-in-out infinite;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typingBounce { 0%, 80%, 100% { transform: translateY(0); opacity: 0.4; } 40% { transform: translateY(-6px); opacity: 1; } }
+
+        /* ===== INPUT AREA ===== */
+        .input-area {
+            padding: 14px 16px;
+            background: rgba(5,15,35,0.9);
+            border-top: 1px solid var(--c-border);
+            flex-shrink: 0;
+        }
+        .input-row {
+            display: flex; gap: 10px; align-items: center;
+        }
+        .text-input {
+            flex: 1;
+            background: rgba(0,245,255,0.04);
+            border: 1px solid rgba(0,245,255,0.2);
+            border-radius: 12px;
+            padding: 11px 16px;
+            color: #e0f0ff;
+            font-size: 0.95rem;
+            font-family: var(--font-main);
+            outline: none;
+            transition: all 0.2s;
+        }
+        .text-input::placeholder { color: rgba(0,245,255,0.3); }
+        .text-input:focus { border-color: rgba(0,245,255,0.5); background: rgba(0,245,255,0.07); box-shadow: 0 0 15px rgba(0,245,255,0.1); }
+        .text-input:focus::placeholder { color: rgba(0,245,255,0.5); }
+
+        .mic-btn {
+            width: 46px; height: 46px; border-radius: 12px;
+            background: linear-gradient(135deg, rgba(0,245,255,0.15), rgba(0,100,200,0.15));
+            border: 1px solid rgba(0,245,255,0.35);
+            color: var(--c-cyan); font-size: 1.1rem;
+            cursor: pointer; transition: all 0.2s;
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .mic-btn:hover { background: rgba(0,245,255,0.25); box-shadow: 0 0 15px rgba(0,245,255,0.3); }
+        .mic-btn.active {
+            background: linear-gradient(135deg, rgba(255,0,144,0.25), rgba(255,0,144,0.1));
+            border-color: var(--c-pink); color: var(--c-pink);
+            animation: micPulse 1s ease-in-out infinite;
+        }
+        .mic-btn.muted { color: rgba(255,100,100,0.6); border-color: rgba(255,100,100,0.3); }
+        @keyframes micPulse { 0%, 100% { box-shadow: 0 0 10px rgba(255,0,144,0.3); } 50% { box-shadow: 0 0 25px rgba(255,0,144,0.7); } }
+
+        .send-btn {
+            width: 46px; height: 46px; border-radius: 12px;
+            background: linear-gradient(135deg, var(--c-cyan), var(--c-purple));
+            border: none; color: #000; font-size: 1rem;
+            cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .send-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,245,255,0.5); }
+        .send-btn:active { transform: scale(0.95); }
+
+        .input-meta {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 8px;
+        }
+        .wake-hint { font-size: 0.7rem; color: rgba(0,245,255,0.4); font-family: var(--font-code); }
+        .wake-hint span { color: var(--c-cyan); }
+        .mic-status { font-size: 0.7rem; color: rgba(0,245,255,0.5); font-family: var(--font-code); }
+
+        /* ===== SCAN LINE FX ===== */
+        .scanline-overlay {
+            position: fixed; inset: 0; z-index: 2;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0,0,0,0.03) 0px,
+                rgba(0,0,0,0.03) 1px,
+                transparent 1px,
+                transparent 4px
+            );
+            animation: scanlines 0.5s steps(1) infinite;
+        }
+        @keyframes scanlines { 0% { background-position: 0 0; } 100% { background-position: 0 4px; } }
+
+        /* ===== CORNER DECORATIONS ===== */
+        .corner { position: fixed; width: 40px; height: 40px; z-index: 3; }
+        .corner.tl { top: 0; left: 0; border-top: 2px solid rgba(0,245,255,0.4); border-left: 2px solid rgba(0,245,255,0.4); }
+        .corner.tr { top: 0; right: 0; border-top: 2px solid rgba(0,245,255,0.4); border-right: 2px solid rgba(0,245,255,0.4); }
+        .corner.bl { bottom: 0; left: 0; border-bottom: 2px solid rgba(0,245,255,0.4); border-left: 2px solid rgba(0,245,255,0.4); }
+        .corner.br { bottom: 0; right: 0; border-bottom: 2px solid rgba(0,245,255,0.4); border-right: 2px solid rgba(0,245,255,0.4); }
+    </style>
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg-canvas"></div>
+<div class="grid-lines"></div>
+<div class="particles" id="particles"></div>
+<div class="scanline-overlay"></div>
+<div class="corner tl"></div><div class="corner tr"></div>
+<div class="corner bl"></div><div class="corner br"></div>
+
+<!-- Boot Screen -->
+<div id="boot-screen">
+    <div class="boot-inner">
+        <div class="boot-robot">
+            <div style="position:relative;width:120px;margin:0 auto;">
+                <div class="antenna-ball" style="position:relative;transform:none;left:auto;top:auto;margin:0 auto 4px;"></div>
+                <div style="width:3px;height:20px;background:linear-gradient(to top,rgba(0,245,255,.4),var(--c-cyan));margin:0 auto 4px;border-radius:2px;"></div>
+            </div>
+            <div class="boot-robot-head">
+                <div class="boot-robot-eyes">
+                    <div class="boot-robot-eye"></div>
+                    <div class="boot-robot-eye"></div>
+                </div>
+                <div class="boot-robot-mouth"></div>
+            </div>
+            <div class="boot-robot-body">
+                <div class="boot-led"></div>
+                <div class="boot-led"></div>
+                <div class="boot-led"></div>
+            </div>
+        </div>
+        <div class="boot-title"><span>RK</span> AI</div>
+        <div class="boot-subtitle">ROBOT INTELLIGENCE v4.0</div>
+        <div class="boot-loader-track"><div class="boot-loader-fill"></div></div>
+        <div class="boot-tap">⬡ TAP TO INITIALIZE ⬡</div>
+    </div>
+</div>
+
+<!-- Main App -->
+<div id="app" style="display:none;">
+    <!-- Header -->
+    <header class="header">
+        <div class="brand">
+            <div class="brand-logo">
+                <div class="brand-logo-inner"><i class="fa-solid fa-robot"></i></div>
+            </div>
+            <div class="brand-text">
+                <div class="brand-name"><span>RK</span> AI</div>
+                <div class="brand-version">v4.0 — ROBOT INTELLIGENCE</div>
+                <div class="brand-creator">Created by Ritik Boss 🤖</div>
+            </div>
+        </div>
+        <div class="status-pill">
+            <div class="status-dot" id="status-dot"></div>
+            <span class="status-txt" id="status-txt">SYSTEM READY</span>
+        </div>
+        <div class="header-right">
+            <div class="lang-pills">
+                <button class="lang-pill active" data-lang="hi" id="lang-hi">HI</button>
+                <button class="lang-pill" data-lang="en" id="lang-en">EN</button>
+                <button class="lang-pill" data-lang="gu" id="lang-gu">GU</button>
+                <button class="lang-pill" data-lang="mr" id="lang-mr">MR</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Workspace -->
+    <main class="workspace">
+
+        <!-- Left: Robot -->
+        <div class="robot-panel">
+            <!-- Ambient rings -->
+            <div class="robot-rings">
+                <div class="robot-ring"></div>
+                <div class="robot-ring"></div>
+                <div class="robot-ring"></div>
+            </div>
+
+            <!-- Robot -->
+            <div class="robot-unit" id="robot-unit">
+                <!-- Antenna -->
+                <div class="robot-antenna" style="position:relative;height:40px;">
+                    <div class="antenna-pole"></div>
+                    <div class="antenna-ball"></div>
+                </div>
+
+                <!-- Head -->
+                <div class="robot-head">
+                    <div class="scan-line"></div>
+                    <div class="robot-ear left"><div class="ear-light"></div></div>
+                    <div class="robot-ear right"><div class="ear-light"></div></div>
+                    <div class="robot-eyes">
+                        <div class="robot-eye left-eye"><div class="pupil"></div></div>
+                        <div class="robot-eye right-eye"><div class="pupil"></div></div>
+                    </div>
+                    <div class="robot-nose"></div>
+                    <div class="robot-mouth" id="robot-mouth">
+                        <!-- Mouth segments generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Neck -->
+                <div class="robot-neck"></div>
+
+                <!-- Body -->
+                <div class="robot-body" style="position:relative;">
+                    <div class="robot-arms">
+                        <div class="robot-arm"><div class="arm-joint"></div></div>
+                        <div class="robot-arm"><div class="arm-joint"></div></div>
+                    </div>
+                    <div class="chest-panel">
+                        <div class="chest-led"></div>
+                        <div class="chest-led"></div>
+                        <div class="chest-led"></div>
+                        <div class="chest-led"></div>
+                        <div class="chest-led"></div>
+                        <div class="chest-led"></div>
+                    </div>
+                </div>
+
+                <!-- Legs -->
+                <div class="robot-legs">
+                    <div class="robot-leg"><div class="robot-foot"></div></div>
+                    <div class="robot-leg"><div class="robot-foot"></div></div>
+                </div>
+            </div>
+
+            <!-- State label -->
+            <div class="robot-state" id="robot-state">● READY</div>
+        </div>
+
+        <!-- Right: Chat -->
+        <div class="chat-panel">
+            <div class="chat-header">
+                <div class="chat-header-title">
+                    <i class="fa-solid fa-comment-dots"></i>
+                    MULTILINGUAL CORE — HI / GU / EN / MR
+                </div>
+                <div class="chat-header-right">
+                    <button class="hdr-btn" id="clear-btn" title="Clear chat"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chat-messages">
+                <div class="msg ai">
+                    <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
+                    <div class="msg-bubble">
+                        Namaste! Mera naam RK hai, mujhe Ritik Boss ne banaya hai. Main aapki madad ke liye hamesha taiyyar hoon! 🤖
+                        <span class="msg-time">System Boot</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Typing indicator row -->
+            <div style="padding:0 16px 8px;"><div class="typing-indicator" id="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="input-row">
+                    <button class="mic-btn" id="mic-btn" title="Toggle Mic">
+                        <i class="fa-solid fa-microphone" id="mic-icon"></i>
+                    </button>
+                    <input type="text" class="text-input" id="text-input" placeholder="Type or speak in Hindi / Gujarati / English..." autocomplete="off">
+                    <button class="send-btn" id="send-btn" title="Send"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+                <div class="input-meta">
+                    <div class="wake-hint">Say <span>"Hey RK"</span> to activate</div>
+                    <div class="mic-status" id="mic-status">🎤 Mic On</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script src="/static/assistant/js/main.js?v=4"></script>
+</body>
+</html>
