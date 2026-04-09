@@ -21,7 +21,7 @@ start /b cmd /c "ping 127.0.0.1 -n 4 >nul && start chrome http://127.0.0.1:8001"
 
 :: Start server
 echo Starting server...
-venv\Scripts\uvicorn rk_ai.backend:app --host 127.0.0.1 --port 8001
+venv\Scripts\uvicorn main:app --host 127.0.0.1 --port 8001
 
 :: If server crashes, restart after 2 seconds
 echo Server stopped. Restarting in 2 seconds...
